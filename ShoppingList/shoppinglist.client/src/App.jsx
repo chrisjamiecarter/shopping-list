@@ -1,49 +1,151 @@
-import { useEffect, useState } from 'react';
-import './App.css';
+import "./App.css";
+import Content from "./components/Content";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import AddList from "./components/AddList";
+import { useState, useEffect } from "react";
 
 function App() {
-    const [forecasts, setForecasts] = useState();
+    const API_url = "http://localhost:3500/items";
+
+    const [list, setList] = useState([]);
+
+    const [newItem, setNewItem] = useState("");
+
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        populateWeatherData();
+        const fetchData = async () => {
+            try {
+                const response = await fetch(API_url);
+
+                if (!response.ok) throw Error("Error Message");
+
+                const listItem = await response.json();
+
+                setList(listItem);
+
+                setError(null);
+            } catch (error) { }
+        };
+
+        fetchData();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    // Add new Item to the list
+
+    const addItems = async (item) => {
+        const id = list.length ? list[list.length - 1].id + 1 : 1;
+
+        const theNewItem = {
+            id,
+
+            checked: false,
+
+            item,
+        };
+
+        const listItem = [...list, theNewItem];
+
+        setList(listItem);
+
+        const postOptions = {
+            method: "POST",
+
+            headers: {
+                "content-Type": "application/json",
+            },
+
+            body: JSON.stringify(theNewItem),
+        };
+
+        const result = await request(API_url, postOptions);
+        if (result) setError(result);
+    };
+
+    //  Create a function to update the checked property
+
+    const handleCheck = async (id) => {
+        const listItem = list.map((item) =>
+            item.id === id
+                ? {
+                    ...item,
+
+                    checked: !item.checked,
+                }
+                : item
+        );
+
+        setList(listItem);
+
+        const myitem = listItem.filter((list) => list.id === id);
+
+        const updateOptions = {
+            method: "PATCH",
+
+            headers: {
+                "content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+                checked: myitem[0].checked,
+            }),
+        };
+
+        const reqUrl = `${API_url}/${id}`;
+
+        const result = await request(reqUrl, updateOptions);
+
+        if (result) setError(result);
+    };
+
+    //  create a function to delete an item
+
+    const handleDelete = async (id) => {
+        const listItem = list.filter((item) => item.id !== id);
+
+        setList(listItem);
+
+        const deleteOptions = {
+            method: "DELETE",
+        };
+
+        const reqUrl = `${API_url}/${id}`;
+
+        const result = await request(reqUrl, deleteOptions);
+
+        if (result) setError(result);
+    };
+
+    //  create a function to prevent default submit action
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        addItems(newItem);
+
+        setNewItem("");
+    };
 
     return (
-        <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+        <div className="App">
+            <Header />
+
+            <AddList
+                newItem={newItem}
+                setNewItem={setNewItem}
+                handleSubmit={handleSubmit}
+            />
+
+            <Content
+                list={list}
+                handleCheck={handleCheck}
+                handleDelete={handleDelete}
+            />
+
+            <Footer list={list} />
         </div>
     );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        setForecasts(data);
-    }
 }
 
 export default App;
