@@ -9,11 +9,11 @@ const Content = ({ list, handleCheck, handleDelete }) => {
                                 <input
                                     onChange={() => handleCheck(item.id)}
                                     type="checkbox"
-                                    checked={item.checked}
+                                    checked={item.isPickedUp}
                                 />
 
                                 <label onDoubleClick={() => handleCheck(item.id)}>
-                                    <h3>{item.item}</h3>
+                                    <h3>{item.name}</h3>
                                 </label>
 
                                 <button onClick={() => handleDelete(item.id)}>X</button>

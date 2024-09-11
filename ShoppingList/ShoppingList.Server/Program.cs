@@ -1,3 +1,5 @@
+﻿using Microsoft.EntityFrameworkCore;
+using ShoppingList.Server.Data;
 
 namespace ShoppingList.Server;
 
@@ -6,6 +8,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddDbContext<ShoppingListDataContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("ShoppingList") ?? throw new InvalidOperationException("Connection string 'ShoppingList' not found.")));
 
         // Add services to the container.
 
@@ -30,6 +34,10 @@ public class Program
 
         app.UseAuthorization();
 
+        app.UseCors(options =>
+        {
+            options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        });
 
         app.MapControllers();
 

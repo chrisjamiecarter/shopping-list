@@ -5,9 +5,10 @@ const AddList = ({ newItem, setNewItem, handleSubmit }) => {
 
     return (
         <form className="addForm" onSubmit={handleSubmit}>
-            <label htmlFor="addItem">Add Item</label>
+            <label className="me-3" htmlFor="addItem">Add Item</label>
 
             <input
+                className="me-3"
                 type="text"
                 id="addItem"
                 autoFocus
@@ -19,6 +20,7 @@ const AddList = ({ newItem, setNewItem, handleSubmit }) => {
             />
 
             <button
+                className="me-3"
                 type="submit"
                 aria-label="Add Item"
                 onClick={() => inputRef.current.focus()}

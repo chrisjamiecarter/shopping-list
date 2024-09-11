@@ -6,61 +6,64 @@ import AddList from "./components/AddList";
 import { useState, useEffect } from "react";
 
 function App() {
-    const API_url = "http://localhost:3500/items";
-
+    const API_url = "https://localhost:7257/api/shoppinglistitems";
     const [list, setList] = useState([]);
-
     const [newItem, setNewItem] = useState("");
-
     const [error, setError] = useState(null);
-
+    
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(API_url);
-
-                if (!response.ok) throw Error("Error Message");
-
-                const listItem = await response.json();
-
-                setList(listItem);
-
-                setError(null);
-            } catch (error) { }
-        };
-
-        fetchData();
+        populateShoppingListData();
     }, []);
+
+    //useEffect(() => {
+    //    const fetchData = async () => {
+    //        try {
+    //            const response = await fetch(API_url);
+
+    //            if (!response.ok) throw Error("Error Message");
+
+    //            const listItem = await response.json();
+
+    //            setList(listItem);
+
+    //            setError(null);
+    //        } catch (error) { }
+    //    };
+
+    //    fetchData();
+    //}, []);
 
     // Add new Item to the list
 
     const addItems = async (item) => {
-        const id = list.length ? list[list.length - 1].id + 1 : 1;
-
-        const theNewItem = {
-            id,
-
-            checked: false,
-
-            item,
+        
+        const createRequest = {
+            name: item,
         };
-
-        const listItem = [...list, theNewItem];
-
-        setList(listItem);
-
-        const postOptions = {
+        
+        const options = {
             method: "POST",
-
             headers: {
                 "content-Type": "application/json",
             },
-
-            body: JSON.stringify(theNewItem),
+            body: JSON.stringify(createRequest),
         };
 
-        const result = await request(API_url, postOptions);
-        if (result) setError(result);
+        await fetch(API_url, options)
+            .then(response => response.json())
+            .then(data => {
+                const items = [...list, data];
+                setList(items);
+            })
+            .catch(error => console.error(error));
+            
+        //console.log(result)
+        //if (result) {
+        //    setError(result);
+        //} else {
+        //    const listItem = [...list, theNewItem];
+        //    setList(listItem);
+        //}
     };
 
     //  Create a function to update the checked property
@@ -70,51 +73,51 @@ function App() {
             item.id === id
                 ? {
                     ...item,
-
-                    checked: !item.checked,
+                    isPickedUp: !item.isPickedUp,
                 }
                 : item
         );
 
         setList(listItem);
 
-        const myitem = listItem.filter((list) => list.id === id);
+        const item = listItem.filter((list) => list.id === id);
 
-        const updateOptions = {
-            method: "PATCH",
-
+        const options = {
+            method: "PUT",
             headers: {
                 "content-Type": "application/json",
             },
-
             body: JSON.stringify({
-                checked: myitem[0].checked,
+                name: item[0].name,
+                isPickedUp: item[0].isPickedUp,
             }),
         };
 
         const reqUrl = `${API_url}/${id}`;
+        
+        await fetch(reqUrl, options)
+            .catch(error => console.error(error));
 
-        const result = await request(reqUrl, updateOptions);
-
-        if (result) setError(result);
+        //const result = await request(reqUrl, updateOptions);
+        //if (result) setError(result);
     };
 
     //  create a function to delete an item
 
     const handleDelete = async (id) => {
-        const listItem = list.filter((item) => item.id !== id);
+        const items = list.filter((item) => item.id !== id);
+        setList(items);
 
-        setList(listItem);
-
-        const deleteOptions = {
+        const options = {
             method: "DELETE",
         };
 
         const reqUrl = `${API_url}/${id}`;
 
-        const result = await request(reqUrl, deleteOptions);
+        await fetch(reqUrl, options)
+            .catch(error => consol.error(error));
 
-        if (result) setError(result);
+        //if (result) setError(result);
     };
 
     //  create a function to prevent default submit action
@@ -146,6 +149,12 @@ function App() {
             <Footer list={list} />
         </div>
     );
+
+    async function populateShoppingListData() {
+        const response = await fetch(API_url);
+        const data = await response.json();
+        setList(data);
+    }
 }
 
 export default App;
