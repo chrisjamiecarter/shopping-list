@@ -5,25 +5,35 @@ using ShoppingList.Server.Models;
 
 namespace ShoppingList.Server.Controllers;
 
+/// <summary>
+/// The ShoppingListItemsController class handles API requests for managing shopping list items. 
+/// It provides CRUD operations to interact with shopping list data in the database.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class ShoppingListItemsController : ControllerBase
 {
+    #region Fields
+
     private readonly ShoppingListDataContext _context;
+
+    #endregion
+    #region Constructors
 
     public ShoppingListItemsController(ShoppingListDataContext context)
     {
         _context = context;
     }
 
-    // GET: api/ShoppingListItems
+    #endregion
+    #region Methods
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ShoppingListItem>>> Get()
     {
         return await _context.ShoppingListItems.ToListAsync();
     }
 
-    // GET: api/ShoppingListItems/5
     [HttpGet("{id}")]
     public async Task<ActionResult<ShoppingListItem>> Get(Guid id)
     {
@@ -37,8 +47,6 @@ public class ShoppingListItemsController : ControllerBase
         return shoppingListItem;
     }
 
-    // PUT: api/ShoppingListItems/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, UpdateShoppingListItem request)
     {
@@ -70,8 +78,6 @@ public class ShoppingListItemsController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/ShoppingListItems
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
     public async Task<ActionResult<ShoppingListItem>> Create(CreateShoppingListItem request)
     {
@@ -88,7 +94,6 @@ public class ShoppingListItemsController : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = shoppingListItem.Id }, shoppingListItem);
     }
 
-    // DELETE: api/ShoppingListItems/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -108,4 +113,6 @@ public class ShoppingListItemsController : ControllerBase
     {
         return _context.ShoppingListItems.Any(e => e.Id == id);
     }
+
+    #endregion
 }
