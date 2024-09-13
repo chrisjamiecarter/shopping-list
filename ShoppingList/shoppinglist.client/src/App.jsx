@@ -1,39 +1,38 @@
 import "./App.css";
-import Content from "./components/Content";
-import Footer from "./components/Footer";
 import Header from "./components/Header";
-import AddList from "./components/AddList";
+import AddShoppingListItem from "./components/AddShoppingListItem";
+import ShoppingList from "./components/ShoppingList";
+import ShoppingListSummary from "./components/ShoppingListSummary";
+import Footer from "./components/Footer";
 import { useState, useEffect } from "react";
 
 function App() {
-    const API_url = "https://localhost:7257/api/shoppinglistitems";
+    const apiUrl = "https://localhost:7257/api/shoppinglistitems";
     const [list, setList] = useState([]);
     const [newItem, setNewItem] = useState("");
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    
-    useEffect(() => {
-        populateShoppingListData();
-    }, []);
 
-    //useEffect(() => {
-    //    const fetchData = async () => {
-    //        try {
-    //            const response = await fetch(API_url);
-
-    //            if (!response.ok) throw Error("Error Message");
-
-    //            const listItem = await response.json();
-
-    //            setList(listItem);
-
-    //            setError(null);
-    //        } catch (error) { }
-    //    };
-
-    //    fetchData();
-    //}, []);
-
-    // Add new Item to the list
+    const fetchData = async () => {
+        fetch(apiUrl)
+            .then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                throw response;
+            })
+            .then(data => {
+                console.log(data);
+                setList(data);
+            })
+            .catch(error => {
+                console.error("Error fetching data: ", error);
+                setError(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }
 
     const addItems = async (item) => {
         
@@ -49,24 +48,14 @@ function App() {
             body: JSON.stringify(createRequest),
         };
 
-        await fetch(API_url, options)
+        await fetch(apiUrl, options)
             .then(response => response.json())
             .then(data => {
                 const items = [...list, data];
                 setList(items);
             })
             .catch(error => console.error(error));
-            
-        //console.log(result)
-        //if (result) {
-        //    setError(result);
-        //} else {
-        //    const listItem = [...list, theNewItem];
-        //    setList(listItem);
-        //}
     };
-
-    //  Create a function to update the checked property
 
     const handleCheck = async (id) => {
         const listItem = list.map((item) =>
@@ -93,16 +82,11 @@ function App() {
             }),
         };
 
-        const reqUrl = `${API_url}/${id}`;
+        const reqUrl = `${apiUrl}/${id}`;
         
         await fetch(reqUrl, options)
             .catch(error => console.error(error));
-
-        //const result = await request(reqUrl, updateOptions);
-        //if (result) setError(result);
     };
-
-    //  create a function to delete an item
 
     const handleDelete = async (id) => {
         const items = list.filter((item) => item.id !== id);
@@ -112,15 +96,11 @@ function App() {
             method: "DELETE",
         };
 
-        const reqUrl = `${API_url}/${id}`;
+        const reqUrl = `${apiUrl}/${id}`;
 
         await fetch(reqUrl, options)
             .catch(error => consol.error(error));
-
-        //if (result) setError(result);
     };
-
-    //  create a function to prevent default submit action
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -129,32 +109,35 @@ function App() {
 
         setNewItem("");
     };
+    
+    useEffect(() => {
+        fetchData();
+    }, []);
 
+    if (loading) return <div className="loading">Loading Data...</div>;
+    if (error) return <div className="error">Error Loading Data! {error.message}</div>;
+    
     return (
         <div className="App">
             <Header />
 
-            <AddList
+            <AddShoppingListItem
                 newItem={newItem}
                 setNewItem={setNewItem}
                 handleSubmit={handleSubmit}
             />
 
-            <Content
+            <ShoppingList
                 list={list}
                 handleCheck={handleCheck}
                 handleDelete={handleDelete}
             />
 
-            <Footer list={list} />
+            <ShoppingListSummary list={list} />
+
+            <Footer />
         </div>
     );
-
-    async function populateShoppingListData() {
-        const response = await fetch(API_url);
-        const data = await response.json();
-        setList(data);
-    }
 }
 
 export default App;

@@ -1,9 +1,10 @@
-const Footer = ({ list }) => {
+const Footer = () => {
+
     return (
         <footer className="footer">
-            <h3>
-                {list.length} List {list.length === 1 ? "Item" : "Items"}{" "}
-            </h3>
+            <div className="container footer-text">
+                &copy; Copyright {new Date().getFullYear()}. Made by <a className="footer-text" href="https://chrisjamiecarter.github.io/">Chris Carter</a>
+            </div>
         </footer>
     );
 };

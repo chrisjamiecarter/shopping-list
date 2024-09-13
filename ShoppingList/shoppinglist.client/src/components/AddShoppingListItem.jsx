@@ -1,14 +1,14 @@
 import { useRef } from "react";
 
-const AddList = ({ newItem, setNewItem, handleSubmit }) => {
+const AddShoppingListItem = ({ newItem, setNewItem, handleSubmit }) => {
     const inputRef = useRef();
 
     return (
-        <form className="addForm" onSubmit={handleSubmit}>
-            <label className="me-3" htmlFor="addItem">Add Item</label>
+        <form className="d-flex justify-content-between my-3" onSubmit={handleSubmit}>
+            <label className="d-flex align-items-center" htmlFor="addItem">Add:</label>
 
             <input
-                className="me-3"
+                className="mx-3"
                 type="text"
                 id="addItem"
                 autoFocus
@@ -20,15 +20,14 @@ const AddList = ({ newItem, setNewItem, handleSubmit }) => {
             />
 
             <button
-                className="me-3"
                 type="submit"
                 aria-label="Add Item"
                 onClick={() => inputRef.current.focus()}
             >
-                <h3>+</h3>
+                <span className="btn-text">+</span>
             </button>
         </form>
     );
 };
 
-export default AddList;
+export default AddShoppingListItem;
