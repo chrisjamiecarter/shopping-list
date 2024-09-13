@@ -36,7 +36,7 @@ It allows users to view a shopping list of items from an external API and perfor
 
 The `InitialCreate` database migration has been created.
 
-On startup, the api application will migrate and create the database if required.
+On start-up, the api application will migrate and create the database if required.
 
 ### Prerequisites
 
