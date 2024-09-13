@@ -114,8 +114,26 @@ function App() {
         fetchData();
     }, []);
 
-    if (loading) return <div className="loading">Loading Data...</div>;
-    if (error) return <div className="error">Error Loading Data! {error.message}</div>;
+    if (loading) return (
+        <div className="App">
+            <Header />
+            <div className="loading">
+                Loading Data...
+            </div>
+            <Footer />
+        </div>
+    );
+
+    if (error) return (
+        
+        <div className="App">
+            <Header />
+            <div className="error">
+                Error Loading Data! {error.message}
+            </div>
+            <Footer />
+        </div>
+    );
     
     return (
         <div className="App">
