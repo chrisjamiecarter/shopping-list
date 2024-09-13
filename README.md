@@ -71,6 +71,11 @@ On startup, the api application will migrate and create the database if required
 
 ### Running the Application
 
+1. You can run both applications from Visual Studio, using the Multiple Startup Projects option:
+	![application start up configuration](./_resources/application-start-up-configuration.png)
+
+OR
+
 1. Run the API application using the .NET CLI in the API project directory:
 	- `dotnet run`
 
